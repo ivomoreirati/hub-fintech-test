@@ -6,6 +6,7 @@ import br.com.hubfintech.dto.TransactionResponseDTO;
 import br.com.hubfintech.services.CardTransactionService;
 import br.com.hubfintech.util.JSON;
 import br.com.hubfintech.util.Util;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+@Slf4j
 public class TCPServer{
     
     static public void createServerTCP(int port, CardTransactionService cardTransactionService) {
@@ -30,15 +32,15 @@ public class TCPServer{
 
             serverSocket.bind(address);
 
-            System.out.println("Create server TCP success: IP: "
+            log.info("Create server TCP success: IP: "
                     + address.getAddress().getHostAddress() + " in Port: " + address.getPort());
 
             while(true)
                 processing(serverSocket.accept(), cardTransactionService);
             
         }catch(IOException e){
-            
-            System.err.println("Error create Server TCP in Port: " + port + e);
+
+            log.info("Error create Server TCP in Port: " + port + e);
         }
     }
 
@@ -79,7 +81,7 @@ public class TCPServer{
 
         }catch(Exception e){
 
-            System.err.println("Client loss conection in Server TCP.");
+            log.error("Client loss conection in Server TCP.");
 
             e.printStackTrace();
         }

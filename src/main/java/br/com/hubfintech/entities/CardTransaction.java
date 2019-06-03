@@ -9,13 +9,18 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Data
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "cardTransaction")
 public class CardTransaction implements Serializable{
     
     private static final long serialVersionUID = 1L;
     
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id; 
     
     @Temporal(TemporalType.TIMESTAMP)

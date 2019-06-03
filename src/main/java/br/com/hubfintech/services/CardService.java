@@ -21,7 +21,16 @@ public class CardService {
         
         return cardRepository.save(c);
     }
-  
+
+    public Card getCardByCardNumber(String cardNumber) {
+
+        return cardRepository.findCardByCardnumber(cardNumber);
+    }
+
+    public List<Card> getAllCards(){
+        return cardRepository.findAll();
+    }
+
     public CardDTO getCardDTO(Card c){
 
         if(c != null){
@@ -43,19 +52,15 @@ public class CardService {
         return null;
     }
 
-    public List<CardDTO> getListCardDTO(List<Card> list){
+    public List<CardDTO> getListCardDTO(){
+        List<CardDTO> result = new LinkedList<>();
+        getAllCards().stream().forEach(card -> {
+            result.add(getCardDTO(card));
+        });
 
-        if((list != null) && (list.size() > 0)){
-
-            List<CardDTO> result = new LinkedList<>();
-
-            list.stream().forEach((c) -> {
-                result.add(getCardDTO(c));
-                                });
-
+        if((result != null) && (result.size() > 0)){
             return result;
         }
-
         return null;
     }
 

@@ -9,4 +9,6 @@ public interface CardRepository extends CrudRepository<Card, Long>{
 
     @Override
     List<Card> findAll();
+
+    Card findCardByCardnumber(String cardNumber);
 }
