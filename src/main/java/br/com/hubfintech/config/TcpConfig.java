@@ -57,15 +57,6 @@ public class TcpConfig {
                     log.error("Error create TCP MultiThread. " + e.getMessage());
                 }
             });
-
-            Executors.newSingleThreadExecutor().execute(() -> {
-                try{
-                    new CardStoreService(cardService, cardTransactionService).processing();
-
-                }catch(Exception e){
-                    log.error("Error create server TCP MultiThread. " + e.getMessage());
-                }
-            });
         };
     }
 }

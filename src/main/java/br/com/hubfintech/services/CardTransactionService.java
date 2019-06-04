@@ -1,73 +1,45 @@
 package br.com.hubfintech.services;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import br.com.hubfintech.constants.TransactionResultCode;
 import br.com.hubfintech.constants.TransactionType;
 import br.com.hubfintech.dto.TransactionRequestDTO;
 import br.com.hubfintech.dto.TransactionResponseDTO;
 import br.com.hubfintech.entities.Card;
 import br.com.hubfintech.entities.CardTransaction;
-import br.com.hubfintech.producer.Producer;
 import br.com.hubfintech.repositories.CardRepository;
 import br.com.hubfintech.repositories.CardTransactionRepository;
 import br.com.hubfintech.util.Util;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class CardTransactionService  extends BaseProcessorService<TransactionRequestDTO> {
+import java.math.BigDecimal;
+import java.util.Date;
 
-    @Autowired
-    protected Producer producer;
-    
+public class CardTransactionService {
+
     @Autowired
     CardTransactionRepository cardTransactionRepository;
 
     @Autowired
     CardRepository cardRepository;
 
-    public void sendMessage(TransactionRequestDTO request) {
-        producer.sendTransactionRequest(request);
-    }
-
-    @Override
-    @Transactional
-    public void process(TransactionRequestDTO request) {
-        processRequestTransaction(request);
-    }
-    public TransactionResponseDTO processResponseTransaction(String cardNumber){
-        TransactionResponseDTO response = new TransactionResponseDTO();
-        CardTransaction cardTransaction = getLastCardTransaction(cardRepository.findCardByCardnumber(cardNumber));
-        response.setAction(cardTransaction.getTransactionType().getType());
-        response.setAuthorization_code(cardTransaction.getId().toString());
-        response.setCode(cardTransaction.getResultCode().getCode());
-        return response;
-
-    }
-    
-    public void processRequestTransaction(TransactionRequestDTO request){
+    public TransactionResponseDTO processRequestTransaction(TransactionRequestDTO request){
 
         if(request != null){
             
-//            TransactionResponseDTO response = new TransactionResponseDTO();
-//            response.setAction(request.getAction());
+            TransactionResponseDTO response = new TransactionResponseDTO();
+            response.setAction(request.getAction());
             
             TransactionType tt = getTransactionTypeByValue(request.getAction());
             
             BigDecimal req_ammount = Util.convertStringToBigDecimal(request.getAmount());
             
             if((tt == null) || (req_ammount == null))
-                this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount);
-//                return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
-//                                                           this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount));
+                return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
+                                                           this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount));
                 
             if(req_ammount.compareTo(BigDecimal.ZERO) <= 0)
-                this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount);
-//                return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
-//                                                           this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount));
+                return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
+                                                           this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount));
             
 
             Card card = cardRepository.findCardByCardnumber(request.getCardnumber());
@@ -83,40 +55,36 @@ public class CardTransactionService  extends BaseProcessorService<TransactionReq
                         if(avaliable_amount.compareTo(BigDecimal.ZERO) >= 0){
 
                             TransactionResultCode tc = TransactionResultCode.APPROVED;
-//                            response.setCode(tc.getCode());
+                            response.setCode(tc.getCode());
 
                             card = this.saveTransaction(card, tt, tc, req_ammount, avaliable_amount);
 
-//                            response.setAuthorization_code(Util.converteLongAuthorizationCode(getIdLastCardTransaction(card)));
+                            response.setAuthorization_code(Util.converteLongAuthorizationCode(getIdLastCardTransaction(card)));
 
                         }else{
-                            this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.INSUFFICIENT_FUNDS, req_ammount);
-//                            return createTransactionResponseDTO(tt, TransactionResultCode.INSUFFICIENT_FUNDS,
-//                                                                       this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.INSUFFICIENT_FUNDS, req_ammount));
+                            return createTransactionResponseDTO(tt, TransactionResultCode.INSUFFICIENT_FUNDS,
+                                                                       this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.INSUFFICIENT_FUNDS, req_ammount));
                         }
 
                         break;
                     }
 
                     default:{
-                        this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount);
-//                        return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
-//                                                                   this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount));
+                        return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
+                                                                   this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount));
                     }
                 }
 
-//                return response;
+                return response;
 
             }else{
-                this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.INVALID_ACCOUNT, req_ammount);
-//                return createTransactionResponseDTO(tt, TransactionResultCode.INVALID_ACCOUNT,
-//                        this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.INVALID_ACCOUNT, req_ammount));
+                return createTransactionResponseDTO(tt, TransactionResultCode.INVALID_ACCOUNT,
+                        this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.INVALID_ACCOUNT, req_ammount));
             }
 
         }
-        this.saveTransaction(request.getCardnumber(), null, TransactionResultCode.PROCESSING_ERROR, null);
-//        return createTransactionResponseDTO(null, TransactionResultCode.PROCESSING_ERROR,
-//                this.saveTransaction(request.getCardnumber(), null, TransactionResultCode.PROCESSING_ERROR, null));
+        return createTransactionResponseDTO(null, TransactionResultCode.PROCESSING_ERROR,
+                this.saveTransaction(request.getCardnumber(), null, TransactionResultCode.PROCESSING_ERROR, null));
     }
     
     public TransactionType getTransactionTypeByValue(String value){

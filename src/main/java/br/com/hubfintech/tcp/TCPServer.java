@@ -3,7 +3,6 @@ package br.com.hubfintech.tcp;
 import br.com.hubfintech.constants.TransactionResultCode;
 import br.com.hubfintech.dto.TransactionRequestDTO;
 import br.com.hubfintech.dto.TransactionResponseDTO;
-import br.com.hubfintech.producer.Producer;
 import br.com.hubfintech.services.CardTransactionService;
 import br.com.hubfintech.util.JSON;
 import br.com.hubfintech.util.Util;
@@ -17,14 +16,9 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 @Slf4j
 public class TCPServer{
 
-    @Autowired
-    Producer producer;
-    
     static public void createServerTCP(int port, CardTransactionService cardTransactionService) {
         
         ServerSocket serverSocket;
@@ -69,16 +63,15 @@ public class TCPServer{
                         (TransactionRequestDTO) JSON.convertJSON_OBJ(request, TransactionRequestDTO.class);
 
                 if(request_dto != null){
-                    cardTransactionService.sendMessage(request_dto);
-                    response_dto = cardTransactionService.processResponseTransaction(request_dto.getCardnumber());
+                    response_dto = cardTransactionService.processRequestTransaction(request_dto);
 
                 }
-//                else response_dto =
-//                        CardTransactionService.createTransactionResponseDTO(null, TransactionResultCode.PROCESSING_ERROR, -1L);
+                else response_dto =
+                        CardTransactionService.createTransactionResponseDTO(null, TransactionResultCode.PROCESSING_ERROR, -1L);
 
             }
-//            else response_dto =
-//                    CardTransactionService.createTransactionResponseDTO(null, TransactionResultCode.PROCESSING_ERROR, -1L);
+            else response_dto =
+                    CardTransactionService.createTransactionResponseDTO(null, TransactionResultCode.PROCESSING_ERROR, -1L);
 
             String response = JSON.convertOBJ_JSON(response_dto);
 
