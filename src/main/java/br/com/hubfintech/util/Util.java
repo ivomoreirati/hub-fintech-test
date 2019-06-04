@@ -8,14 +8,14 @@ import java.util.Date;
 
 public class Util {
     
-    static public String converteLongAuthorizationCode(Long n){
+    static public String convertLongAuthorizationCode(Long n){
         
-        return converteNumber_TamanhoCasasFixas(n, '0', 6);
+        return convertNumber_SizeFixed(n, '0', 6);
     }
     
-    static public String converteNumber_TamanhoCasasFixas(Number n, char caracter_adicao, int numero_casas){
+    static public String convertNumber_SizeFixed(Number n, char caracterAdd, int numberFixed){
         
-        return String.format("%" + caracter_adicao + numero_casas + "d", n);
+        return String.format("%" + caracterAdd + numberFixed + "d", n);
     }
     
     static public String convertDate(Date data){

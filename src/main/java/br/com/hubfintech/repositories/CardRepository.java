@@ -1,9 +1,10 @@
 package br.com.hubfintech.repositories;
 
-import br.com.hubfintech.entities.Card;
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
+import br.com.hubfintech.entities.Card;
 
 public interface CardRepository extends CrudRepository<Card, Long>{
 

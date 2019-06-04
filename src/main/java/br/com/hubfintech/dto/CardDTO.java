@@ -1,9 +1,9 @@
 package br.com.hubfintech.dto;
 
-import lombok.Data;
-
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class CardDTO {
@@ -12,6 +12,6 @@ public class CardDTO {
     
     private String availableAmount;
     
-    private List<CardTransactionDTO> transactions = new LinkedList<>();
+    private List<CardTransactionDTO> transactions = new ArrayList<>();
     
 }

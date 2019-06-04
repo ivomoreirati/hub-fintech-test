@@ -1,32 +1,38 @@
 package br.com.hubfintech.services;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
 import br.com.hubfintech.dto.CardDTO;
 import br.com.hubfintech.dto.CardTransactionDTO;
 import br.com.hubfintech.entities.Card;
 import br.com.hubfintech.entities.CardTransaction;
 import br.com.hubfintech.repositories.CardRepository;
 import br.com.hubfintech.util.Util;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
+@Service
 public class CardService {
     
      @Autowired
      CardRepository cardRepository;
-     
+
     public Card saveCard(Card c) {
         
         return cardRepository.save(c);
     }
 
-    public Card getCardByCardNumber(String cardNumber) {
+    @Cacheable("card")
+    public Card getCardByCardNumber(String cardnumber) {
 
-        return cardRepository.findCardByCardnumber(cardNumber);
+        return cardRepository.findCardByCardnumber(cardnumber);
     }
 
+    @Cacheable("cards")
     public List<Card> getAllCards(){
         return cardRepository.findAll();
     }

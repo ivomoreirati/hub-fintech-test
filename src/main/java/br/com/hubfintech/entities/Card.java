@@ -2,11 +2,9 @@ package br.com.hubfintech.entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +38,6 @@ public class Card implements Serializable {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name="card_id")
     @Fetch(FetchMode.SELECT)
-    private List<CardTransaction> transactions = new LinkedList<>();
+    private List<CardTransaction> transactions = new ArrayList<>();
     
 }

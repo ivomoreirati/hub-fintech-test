@@ -1,5 +1,11 @@
 package br.com.hubfintech.services;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import br.com.hubfintech.constants.TransactionResultCode;
 import br.com.hubfintech.constants.TransactionType;
 import br.com.hubfintech.dto.TransactionRequestDTO;
@@ -9,11 +15,8 @@ import br.com.hubfintech.entities.CardTransaction;
 import br.com.hubfintech.repositories.CardRepository;
 import br.com.hubfintech.repositories.CardTransactionRepository;
 import br.com.hubfintech.util.Util;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
+@Service
 public class CardTransactionService {
 
     @Autowired
@@ -59,7 +62,7 @@ public class CardTransactionService {
 
                             card = this.saveTransaction(card, tt, tc, req_ammount, avaliable_amount);
 
-                            response.setAuthorization_code(Util.converteLongAuthorizationCode(getIdLastCardTransaction(card)));
+                            response.setAuthorization_code(Util.convertLongAuthorizationCode(getIdLastCardTransaction(card)));
 
                         }else{
                             return createTransactionResponseDTO(tt, TransactionResultCode.INSUFFICIENT_FUNDS,
@@ -163,7 +166,7 @@ public class CardTransactionService {
         response_dto.setCode(trc.getCode());
         
         if(ac != null)
-            response_dto.setAuthorization_code(Util.converteLongAuthorizationCode(ac));
+            response_dto.setAuthorization_code(Util.convertLongAuthorizationCode(ac));
      
         return response_dto;
     }

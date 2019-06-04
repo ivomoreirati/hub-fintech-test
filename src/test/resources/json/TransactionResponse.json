@@ -1,0 +1,9 @@
+{
+
+  "action": "withdraw",
+
+  "code":"00",
+
+  "authorization_code": "123456"
+
+}
