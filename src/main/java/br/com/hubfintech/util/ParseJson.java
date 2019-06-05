@@ -5,7 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-public class JSON{
+/**
+ * Class for parse json to objects . . .
+ *
+ * @author Ivo Moreira
+ *
+ */
+
+public class ParseJson
+{
     
     static private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     

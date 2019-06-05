@@ -2,6 +2,13 @@ package br.com.hubfintech.constants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Class enum for transaction type . . .
+ *
+ * @author Ivo Moreira
+ *
+ */
+
 public enum TransactionType {
     
     WITHDRAW("withdraw");

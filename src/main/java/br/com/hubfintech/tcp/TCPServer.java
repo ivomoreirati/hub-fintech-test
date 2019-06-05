@@ -4,7 +4,7 @@ import br.com.hubfintech.constants.TransactionResultCode;
 import br.com.hubfintech.dto.TransactionRequestDTO;
 import br.com.hubfintech.dto.TransactionResponseDTO;
 import br.com.hubfintech.services.CardTransactionService;
-import br.com.hubfintech.util.JSON;
+import br.com.hubfintech.util.ParseJson;
 import br.com.hubfintech.util.Util;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,6 +15,13 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+/**
+ * Class for use of port socket with threads for receive requests . . .
+ *
+ * @author Ivo Moreira
+ *
+ */
 
 @Slf4j
 public class TCPServer{
@@ -60,7 +67,7 @@ public class TCPServer{
             if((request != null) && (request.length() > 0)){
 
                 TransactionRequestDTO request_dto =
-                        (TransactionRequestDTO) JSON.convertJSON_OBJ(request, TransactionRequestDTO.class);
+                        (TransactionRequestDTO) ParseJson.convertJSON_OBJ(request, TransactionRequestDTO.class);
 
                 if(request_dto != null){
                     response_dto = cardTransactionService.processRequestTransaction(request_dto);
@@ -73,7 +80,7 @@ public class TCPServer{
             else response_dto =
                     CardTransactionService.createTransactionResponseDTO(null, TransactionResultCode.PROCESSING_ERROR, -1L);
 
-            String response = JSON.convertOBJ_JSON(response_dto);
+            String response = ParseJson.convertOBJ_JSON(response_dto);
 
             out.println(response);
 

@@ -15,6 +15,13 @@ import br.com.hubfintech.entities.CardTransaction;
 import br.com.hubfintech.repositories.CardRepository;
 import br.com.hubfintech.util.Util;
 
+/**
+ * Class for manipulate cards . . .
+ *
+ * @author Ivo Moreira
+ *
+ */
+
 @Service
 public class CardService {
     

@@ -2,6 +2,12 @@ package br.com.hubfintech.constants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Class enum for transaction status . . .
+ *
+ * @author Ivo Moreira
+ *
+ */
 public enum TransactionResultCode {
     
     APPROVED("00"), INSUFFICIENT_FUNDS("51"), INVALID_ACCOUNT("14"), PROCESSING_ERROR("96");

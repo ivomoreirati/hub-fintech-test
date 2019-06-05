@@ -12,9 +12,18 @@ import br.com.hubfintech.dto.TransactionRequestDTO;
 import br.com.hubfintech.dto.TransactionResponseDTO;
 import br.com.hubfintech.entities.Card;
 import br.com.hubfintech.entities.CardTransaction;
+import br.com.hubfintech.exceptions.ProcessorBadRequestException;
 import br.com.hubfintech.repositories.CardRepository;
 import br.com.hubfintech.repositories.CardTransactionRepository;
 import br.com.hubfintech.util.Util;
+
+
+/**
+ * Class for process transactions card . . .
+ *
+ * @author Ivo Moreira
+ *
+ */
 
 @Service
 public class CardTransactionService {
@@ -25,69 +34,80 @@ public class CardTransactionService {
     @Autowired
     CardRepository cardRepository;
 
+
+    /**
+     * Method main for process transaction request. . .
+     * @param request for process transaction
+     * @return transaction response
+     */
     public TransactionResponseDTO processRequestTransaction(TransactionRequestDTO request){
+        try {
+            if (request != null) {
 
-        if(request != null){
-            
-            TransactionResponseDTO response = new TransactionResponseDTO();
-            response.setAction(request.getAction());
-            
-            TransactionType tt = getTransactionTypeByValue(request.getAction());
-            
-            BigDecimal req_ammount = Util.convertStringToBigDecimal(request.getAmount());
-            
-            if((tt == null) || (req_ammount == null))
-                return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
-                                                           this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount));
-                
-            if(req_ammount.compareTo(BigDecimal.ZERO) <= 0)
-                return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
-                                                           this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount));
-            
+                TransactionResponseDTO response = new TransactionResponseDTO();
+                response.setAction(request.getAction());
 
-            Card card = cardRepository.findCardByCardnumber(request.getCardnumber());
+                TransactionType tt = getTransactionTypeByValue(request.getAction());
 
-            if(card != null){
+                BigDecimal req_ammount = Util.convertStringToBigDecimal(request.getAmount());
 
-                switch(tt){
+                if ((tt == null) || (req_ammount == null))
+                    return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
+                            this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR,
+                                    req_ammount));
 
-                    case WITHDRAW:{
+                if (req_ammount.compareTo(BigDecimal.ZERO) <= 0)
+                    return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
+                            this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR,
+                                    req_ammount));
 
-                        BigDecimal avaliable_amount = card.getAvailableAmount().subtract(req_ammount);
+                Card card = cardRepository.findCardByCardnumber(request.getCardnumber());
 
-                        if(avaliable_amount.compareTo(BigDecimal.ZERO) >= 0){
+                if (card != null) {
 
-                            TransactionResultCode tc = TransactionResultCode.APPROVED;
-                            response.setCode(tc.getCode());
+                    switch (tt) {
 
-                            card = this.saveTransaction(card, tt, tc, req_ammount, avaliable_amount);
+                        case WITHDRAW: {
 
-                            response.setAuthorization_code(Util.convertLongAuthorizationCode(getIdLastCardTransaction(card)));
+                            BigDecimal avaliable_amount = card.getAvailableAmount().subtract(req_ammount);
 
-                        }else{
-                            return createTransactionResponseDTO(tt, TransactionResultCode.INSUFFICIENT_FUNDS,
-                                                                       this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.INSUFFICIENT_FUNDS, req_ammount));
+                            if (avaliable_amount.compareTo(BigDecimal.ZERO) >= 0) {
+
+                                TransactionResultCode tc = TransactionResultCode.APPROVED;
+                                response.setCode(tc.getCode());
+
+                                card = this.saveTransaction(card, tt, tc, req_ammount, avaliable_amount);
+
+                                response.setAuthorization_code(
+                                        Util.convertLongAuthorizationCode(getIdLastCardTransaction(card)));
+                            } else {
+                                return createTransactionResponseDTO(tt, TransactionResultCode.INSUFFICIENT_FUNDS,
+                                        this.saveTransaction(request.getCardnumber(), tt,
+                                                TransactionResultCode.INSUFFICIENT_FUNDS, req_ammount));
+                            }
+
+                            break;
                         }
 
-                        break;
+                        default: {
+                            return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
+                                    this.saveTransaction(request.getCardnumber(), tt,
+                                            TransactionResultCode.PROCESSING_ERROR, req_ammount));
+                        }
                     }
 
-                    default:{
-                        return createTransactionResponseDTO(tt, TransactionResultCode.PROCESSING_ERROR,
-                                                                   this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.PROCESSING_ERROR, req_ammount));
-                    }
+                    return response;
+                } else {
+                    return createTransactionResponseDTO(tt, TransactionResultCode.INVALID_ACCOUNT,
+                            this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.INVALID_ACCOUNT,
+                                    req_ammount));
                 }
-
-                return response;
-
-            }else{
-                return createTransactionResponseDTO(tt, TransactionResultCode.INVALID_ACCOUNT,
-                        this.saveTransaction(request.getCardnumber(), tt, TransactionResultCode.INVALID_ACCOUNT, req_ammount));
             }
-
+            return createTransactionResponseDTO(null, TransactionResultCode.PROCESSING_ERROR,
+                    this.saveTransaction(request.getCardnumber(), null, TransactionResultCode.PROCESSING_ERROR, null));
+        } catch(Exception ex){
+            throw new ProcessorBadRequestException("Error transaction process!", ex.getMessage());
         }
-        return createTransactionResponseDTO(null, TransactionResultCode.PROCESSING_ERROR,
-                this.saveTransaction(request.getCardnumber(), null, TransactionResultCode.PROCESSING_ERROR, null));
     }
     
     public TransactionType getTransactionTypeByValue(String value){

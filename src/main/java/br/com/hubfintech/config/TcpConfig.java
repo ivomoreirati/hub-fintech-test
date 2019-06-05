@@ -15,6 +15,14 @@ import org.springframework.context.annotation.Configuration;
 import java.math.BigDecimal;
 import java.util.concurrent.Executors;
 
+
+/**
+ * Class for configuration port socket with threads for receive requests . . .
+ *
+ * @author Ivo Moreira
+ *
+ */
+
 @Configuration
 @Slf4j
 public class TcpConfig {

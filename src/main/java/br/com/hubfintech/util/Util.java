@@ -6,6 +6,13 @@ import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Class to convert miscellaneous objects  . . .
+ *
+ * @author Ivo Moreira
+ *
+ */
+
 public class Util {
     
     static public String convertLongAuthorizationCode(Long n){
